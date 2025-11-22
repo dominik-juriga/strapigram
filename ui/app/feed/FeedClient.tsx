@@ -40,16 +40,23 @@ export default function FeedClient({
   jwt: string;
   user: User;
 }) {
-  const { data: posts } = useQuery({
+  const { data: posts, error } = useQuery({
     queryKey: ["posts"],
     queryFn: () => fetchPosts(jwt),
     initialData: initialPosts,
+    retry: false,
     staleTime: 0, // Consider data stale immediately so mutations trigger refetch
   });
 
+  if (error) {
+    return (
+      <div className="max-w-[500px] mx-auto p-4">There is an unknown error</div>
+    );
+  }
+
   return (
     <div className="max-w-[500px] mx-auto">
-      {posts.data.map((post) => (
+      {posts?.data?.map((post) => (
         <Post key={post.id} post={post} jwt={jwt} currentUser={user} />
       ))}
     </div>
